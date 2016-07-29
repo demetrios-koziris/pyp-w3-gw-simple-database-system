@@ -5,7 +5,6 @@ try:
 except ImportError:
     import pickle
 import os
-import sys
 
 
 def create_database(db_name):
@@ -86,12 +85,6 @@ class Table:
         
     def __save(self):
         table_data = [self.name, self.filepath, self.columns, self.rows]
-    #    if sys.version_info[0] < 3:
-    #        protocol_version = 2
-    #    elif 3.4 > sys.version_info[0] > 3:
-    #        protocol_version = 3
-    #    elif 3.3 < sys.version_info[0] <= 3.5:
-    #        protocol_version = 4
         with open(self.filepath, 'wb') as f:
             pickle.dump(table_data, f, protocol=pickle.HIGHEST_PROTOCOL)
 
