@@ -1,10 +1,12 @@
 from .config import BASE_DB_FILE_PATH
 from .exceptions import ValidationError
 try:
-    import cPickle as pickle
+    import cpickle as pickle
 except ImportError:
     import pickle
 import os
+import sys
+
 
 def create_database(db_name):
     if type(db_name) != str:
@@ -12,7 +14,8 @@ def create_database(db_name):
     
     folderpath = os.path.join(BASE_DB_FILE_PATH, db_name)
     if os.path.exists(folderpath):
-       raise ValidationError('Database with name "{}" already exists.'.format(db_name))
+       raise ValidationError('Database with name "{}" already exists.'\
+       .format(db_name))
     
     os.makedirs(folderpath)  
     return Database(folderpath)
@@ -21,7 +24,8 @@ def create_database(db_name):
 def connect_database(db_name):
     folderpath = os.path.join(BASE_DB_FILE_PATH, db_name)
     if not os.path.exists(folderpath):
-        raise ValidationError('Database with name "{}" does not exist.'.format(db_name))
+        raise ValidationError('Database with name "{}" does not exist.'\
+        .format(db_name))
     
     db = Database(folderpath)
     for file_name in os.listdir(folderpath):
@@ -65,13 +69,12 @@ class Table:
         if rows is None:
             rows = []
         self.rows = rows
-        self.counter = 0
         self.__save()
        
     def insert(self, *args):
         new_row = {}
         if len(args) != len(self.columns):
-            raise ValidationError('Invalid amount of field')
+            raise ValidationError('Invalid amount of fields')
         for i, arg in enumerate(args):
             col_header = self.columns[i]
             if type(arg).__name__ != col_header['type']:
@@ -83,8 +86,14 @@ class Table:
         
     def __save(self):
         table_data = [self.name, self.filepath, self.columns, self.rows]
+        if sys.version_info[0] < 3:
+            protocol_version = 2
+        elif sys.version_info[0] < 3.4:
+            protocol_version = 3
+        elif sys.version_info[0] <3.5:
+            protocol_version = 4
         with open(self.filepath, 'wb') as f:
-            pickle.dump(table_data, f)
+            pickle.dump(table_data, f, protocol=protocol_version)
 
     def count(self):
         return len(self.rows)
@@ -96,12 +105,9 @@ class Table:
        return (row for row in self.rows)
         
     def query(self, **kwargs):
-       for row in self.rows:
-           for key, val in kwargs.items():
-               if getattr(row, key) == val:
-                   yield row
+        return (row for row in self.rows for key, val in kwargs.items() if \
+        getattr(row, key) == val)
         
-
 class Row:
     
     def __init__(self, items):
