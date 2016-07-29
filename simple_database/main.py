@@ -1,6 +1,9 @@
 from .config import BASE_DB_FILE_PATH
 from .exceptions import ValidationError
-import cPickle as pickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 import os
 
 def create_database(db_name):
@@ -31,10 +34,6 @@ def connect_database(db_name):
 
 def load_table(filepath):
     with open(filepath, 'rb') as f:
-        data = f.readlines()
-        print('TEST:')
-        print(filepath)
-        print(data)
         table_data = pickle.load(f)
     return Table(table_data[0], table_data[1], table_data[2], table_data[3])
             

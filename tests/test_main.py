@@ -129,7 +129,6 @@ class SimpleDatabaseTestCase(unittest.TestCase):
         gen = self.db.authors.all()
         self.assertTrue(isinstance(gen, types.GeneratorType))
         borges = next(gen)
-        print(borges)
         self.assertEqual(borges.id, 1)
         self.assertEqual(borges.name, 'Jorge Luis Borges')
         self.assertEqual(borges.nationality, 'ARG')
