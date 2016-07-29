@@ -86,14 +86,14 @@ class Table:
         
     def __save(self):
         table_data = [self.name, self.filepath, self.columns, self.rows]
-        if sys.version_info[0] < 3:
-            protocol_version = 2
-        elif sys.version_info[0] < 3.4:
-            protocol_version = 3
-        elif sys.version_info[0] <3.5:
-            protocol_version = 4
+    #    if sys.version_info[0] < 3:
+    #        protocol_version = 2
+    #    elif 3.4 > sys.version_info[0] > 3:
+    #        protocol_version = 3
+    #    elif 3.3 < sys.version_info[0] <= 3.5:
+    #        protocol_version = 4
         with open(self.filepath, 'wb') as f:
-            pickle.dump(table_data, f, protocol=protocol_version)
+            pickle.dump(table_data, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def count(self):
         return len(self.rows)
